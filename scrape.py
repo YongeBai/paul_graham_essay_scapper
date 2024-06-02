@@ -5,6 +5,7 @@ from bs4 import BeautifulSoup
 from ebooklib import epub
 
 IGNORE = ["rss.html", "index.html"]
+COVER_IMAGE = "Y_Combinator_logo.png"
 ESSAY_DIR = "essays"
 
 def fix_title(title: str):
@@ -34,12 +35,23 @@ def create_epub():
     book.set_title("Paul Graham Essays")
     book.add_author("Paul Graham")
 
+    book.set_cover(COVER_IMAGE, open(COVER_IMAGE, 'rb').read())
+    cover_html = f'''
+    <html>
+        <body>
+            <img src="{COVER_IMAGE}"/>
+        </body>
+    </html>
+    '''
+    cover_item = epub.EpubHtml(title='Cover', file_name='cover.xhtml', content=cover_html)
+    book.add_item(cover_item)
     chapters = []
     toc_items = []
     files = os.listdir(ESSAY_DIR)
     files.sort(
         key=lambda file_name: os.path.getmtime(os.path.join(ESSAY_DIR, file_name)), reverse=True
     )
+
     for filename in files:
         if filename.endswith(".html"):
             filepath = os.path.join(ESSAY_DIR, filename)
@@ -58,7 +70,7 @@ def create_epub():
     book.add_item(epub.EpubNcx())
     book.add_item(epub.EpubNav())
 
-    book.spine = ["nav"] + chapters
+    book.spine = ["cover", "nav"] + chapters
 
     epub.write_epub("PG_essays.epub", book)
 
@@ -81,4 +93,4 @@ def main():
     create_epub()
 
 if __name__ == "__main__":
-    main()
+    main()    
