@@ -4,4 +4,5 @@ This is a collection of essays by Paul Graham, scraped from https://www.paulgrah
 
 ## Usage
 `pip install -r requirements.txt`
+
 `python scrape.py`
